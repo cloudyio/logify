@@ -4,13 +4,33 @@ import { PassThrough } from 'stream';
 
 const docker = new Docker();
 
+const MAX_CONTAINERS = 5;
+const queue: (() => Promise<Response>)[] = [];
+let runningContainers = 0;
+
 export async function POST(request: Request) {
   const { script } = await request.json();
 
-  if (!script) {
+  if (!script) { 
     return new Response(JSON.stringify({ error: 'you need to input something!' }), { status: 400 });
   }
 
+  if (typeof script !== 'string' || script.includes('import') || script.includes('exec') || script.includes('eval')) {
+    return new Response(JSON.stringify({ error: 'Invalid script input' }), { status: 400 });
+  }
+
+  return new Promise((resolve) => {
+    queue.push(() => {
+      return executeScript(script).then((response) => {
+        resolve(response);
+        return response;
+      });
+    });
+    processQueue();
+  });
+}
+
+async function executeScript(script: string): Promise<Response> {
   try {
     const code = `
 def add_numbers(a, b):
@@ -84,6 +104,17 @@ else:
   } catch (error) {
     console.error('Error:', error);
     return new Response(JSON.stringify({ error: 'Failed to execute code' }), { status: 500 });
+  } finally {
+    runningContainers--;
+    processQueue();
+  }
+}
+
+function processQueue() {
+  if (runningContainers < MAX_CONTAINERS && queue.length > 0) {
+    runningContainers++;
+    const nextTask = queue.shift();
+    if (nextTask) nextTask();
   }
 }
 
