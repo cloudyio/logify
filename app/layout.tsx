@@ -21,7 +21,7 @@ export default async function RootLayout({
       <body>
           <div className="navbar bg-neutral">
             <div className="flex-1">
-              <a className="btn btn-ghost text-xl">Quetionaire</a>
+              <a className="btn btn-ghost text-xl">Logify</a>
             </div>
             <div className="flex-none">
               {session ? (

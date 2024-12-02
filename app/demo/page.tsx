@@ -127,12 +127,12 @@ export default function Home() {
                         <p className="mb-2">
                           Create a function named <code>add_numbers</code> that takes 2 parameters, <code>num1</code> and <code>num2</code>.
                           <br /><br />
-                          The function should:
+                          The function should:</p>
                             <li className="ml-6">Return the total of both numbers by adding them together.</li>
                 
                           <br />
                           If you have never used Python before, it is similar to other languages. You need to pass a value via return (in this case, the sum of the two numbers).
-                        </p>
+                        <br /><br />
                         <pre className="bg-gray-900 p-2 rounded-md">
                           <code>
                             {`def add_numbers(num1, num2):\n     return ...`}
